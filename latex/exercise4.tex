@@ -1,0 +1,164 @@
+\documentclass[11pt]{article}
+
+% Basic packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{microtype}
+
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}          % Bold math symbols
+\usepackage{physics}     % For better physics notation
+\usepackage{nicefrac}    % For inline fractions
+\usepackage{tensor}      % For tensor indices
+\usepackage{siunitx}     % For units
+
+% Graphics and figures
+\usepackage{graphicx}
+\usepackage{hyperref} % For clickable URLs
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,positioning,matrix}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+
+% Document information
+\title{Neural Networks and Deep Learning\\
+       Exercise 4}
+% \author{Your Name}
+% \date{\today}
+
+\begin{document}
+
+\maketitle
+
+% \section*{Problem 1: Mathematical Foundations of Neural Networks}
+% 
+% \subsection*{1.1 Activation Functions}
+% Prove that the derivative of the sigmoid function $\sigma(x) = \frac{1}{1+e^{-x}}$ is $\sigma'(x) = \sigma(x)(1-\sigma(x))$.
+
+
+\section*{Problem 2}
+
+\textbf{Paper Name and Authors}
+
+The paper is called \emph{``Deep Learning Statistical Arbitrage''}, written by 
+Jorge Guijarro-Ordonez, Markus Pelger, and Greg Zanotti. Arxiv link: \url{https://arxiv.org/abs/2106.04028}. 
+
+\vspace{1em}
+\textbf{Task (Statistical Arbitrage via Residuals)}
+
+They want to build trading signals using residual returns, which come from a 
+standard factor model. In other words, if $R_{n,t}$ is the return of stock $n$ 
+at time $t$, they estimate some factor-based prediction $\hat{R}_{n,t}$, and 
+the residual becomes:
+\[
+\varepsilon_{n,t} \;=\; R_{n,t} \;-\; \hat{R}_{n,t}.
+\]
+By focusing on these $\varepsilon_{n,t}$, the authors try to find short-horizon 
+deviations that revert quickly, hence a form of statistical arbitrage.
+
+\vspace{1em}
+\textbf{Input Data and Preprocessing}
+
+They use a panel of US equity data from the CRSP database, selecting 
+large and liquid stocks. For each stock and day, they compute the factor-based 
+prediction, so that $\varepsilon_{n,t}$ is orthogonal to the systematic factor 
+exposures. This step is called residualization. After that, each 
+residual series is mostly uncorrelated with main risk factors, making it easier 
+to detect short-term mispricings from the factor morel.
+
+\vspace{1em}
+\textbf{Architecture (CNN + Transformer)}
+
+They take each residual time series (30, and 60 days long) and pass it to 
+a two-layer CNN, which finds local features like short trends or 
+local mean-reversion. Then, they feed these local-feature outputs to a 
+Transformer, where the self-attention mechanism chooses which time steps 
+are most relevant. Finally, a simple feedforward neural network takes the 
+Transformer’s outputs and produces a forecast or signal, which 
+says how to trade the residual portfolio.
+
+Some interesting components points are instance normalization before activations in CNN and Relu on the normalized 
+linear transforms before the convolution. 
+
+\vspace{1em}
+\textbf{Training Setup (Supervised)}
+
+They label each day’s trading decision by looking at the objective of maximizing 
+risk-adjusted returns (maximizing the Sharpe ratio). They form a loss/utility 
+function that depends on the performance of the strategy. 
+They use rolling windows: train on older data, then evaluate signals on newer 
+data. So it is supervised, and evaluated out of sample in the sense that the model sees pairs of (residual 
+history, trading outcome) and tries to learn a mapping that yields profitable 
+trades, and the profitability of these trades are evaluated based on data that the model has not been seen yet.
+
+\vspace{1em}
+\textbf{Outcome}
+
+They found the CNN+Transformer model performs better than simpler 
+methods, such as classical Ornstein-Uhlenbeck approaches or Fourier transforms 
+for mean reversion. Their final strategy achieves higher Sharpe ratios and 
+greater returns. This suggests that advanced deep learning can discover richer 
+patterns in residual returns for statistical arbitrage.
+
+
+
+
+
+
+
+
+\section*{Problem 3}
+
+We wish to learn the structure ($\text{Cor}(X,Y) = c$) from the joint distributio of the data. 
+We solve this by minimizing the MSE
+\[
+\min_{w} \ \mathbb{E}\Bigl[\bigl(y - w\,x\bigr)^2\Bigr].
+\]
+Taking the derivative with respect to $w$, we have:
+\[
+\frac{d}{dw}\, \mathbb{E}\Bigl[\bigl(y - w\,x\bigr)^2\Bigr]
+= \mathbb{E}\Bigl[-2\,x\,(y - w\,x)\Bigr] = 0.
+\]
+This implies
+\[
+\mathbb{E}[x\,y] - w\,\mathbb{E}[x^2] = 0,
+\]
+so that the optimal weight is
+\[
+w = \frac{\mathbb{E}[xy]}{\mathbb{E}[x^2]}.
+\]
+Since from the covariance matrix we have $\mathbb{E}[xy] = c$ and $\mathbb{E}[x^2] = 1$, it follows that
+\[
+w = c.
+\]
+Thus, the learned regression parameter is exactly the correlation parameter $c$.
+
+
+This method is self-supervised because:
+\begin{itemize}
+  \item No external labels are needed; the supervision comes entirely from the natural structure of the data.
+  \item The task is a pretext task where the prediction target ($y$) is derived from the data itself.
+  \item The model, by minimizing the prediction error, automatically learns the underlying parameter, which here is $c$.
+\end{itemize}
+
+Interestingly this is quite similar to how we think about 
+
+\end{document}

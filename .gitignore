@@ -1,4 +1,3 @@
-
 # Data
 data/
 *.h5
@@ -45,9 +44,33 @@ node_modules/
 venv/
 .venv
 
-
 # Custom/personal
 proto/
 
 # Dynamic versioning
 _version.py
+
+# LaTeX compilation files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dvi
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+_minted*/
+*.bak
+*.spl
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.cb
+*.cb2

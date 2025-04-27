@@ -1,0 +1,9 @@
+name: nndl
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - jupyter
+  - tqdm
+  - matplotlib
+  - scipy
